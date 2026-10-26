@@ -1,0 +1,10 @@
+# 第二关：基础控制流与启动
+
+从 [第二关讲义：从 template 看懂无人机任务程序](第二关-template入门.md) 开始。
+
+- [template 下载包](template.zip)：解压后放入第一关工作空间的 src；已预装的学员可直接进入编译与运行部分。
+- [template.cpp](src/template/src/template.cpp)：主流程与任务状态机。
+- [template.h](src/template/include/template.h)：回调、位置目标、计时、悬停与降落函数。
+
+你需要，先看懂template，再去实现[任务](第二关-练习与绕圈任务.md)
+
