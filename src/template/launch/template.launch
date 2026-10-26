@@ -1,0 +1,5 @@
+<launch>
+  <!-- template.cpp 使用普通 NodeHandle，从节点命名空间读取参数。 -->
+  <rosparam command="load" file="$(find template)/config/template.yaml" />
+  <node pkg="template" type="template" name="template" output="screen" />
+</launch>
