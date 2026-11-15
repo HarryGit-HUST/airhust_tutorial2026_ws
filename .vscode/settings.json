@@ -1,0 +1,16 @@
+{
+    "ros.distro": "noetic",
+    "cmake.ignoreCMakeListsMissing": true,
+    "cmake.configureOnOpen": false,
+
+    "files.exclude": {
+        "**/build": true,
+        "**/devel": true
+    },
+    "search.exclude": {
+        "**/build": true,
+        "**/devel": true
+    },
+
+    "C_Cpp.intelliSenseEngine": "default"
+}
