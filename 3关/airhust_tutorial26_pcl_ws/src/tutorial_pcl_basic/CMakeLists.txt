@@ -42,13 +42,5 @@ foreach(s 01_io 02_publish 03_filter 05_cluster)
   tutorial_pcl_exe(s${s} src/${s}.cpp)
 endforeach()
 
-# 在线综合练习，src 中保留 TODO，solutions 中提供参考答案
+# 在线综合考核，处理函数由学生补全。
 tutorial_pcl_exe(s07_pipeline src/07_pipeline.cpp)
-
-# 参考答案独立编译，不覆盖学生代码。
-option(TUTORIAL_BUILD_SOLUTIONS "Build reference solutions" OFF)
-if(TUTORIAL_BUILD_SOLUTIONS)
-  foreach(s 01_io 02_publish 03_filter 05_cluster 07_pipeline)
-    tutorial_pcl_exe(solution_s${s} solutions/${s}.cpp)
-  endforeach()
-endif()

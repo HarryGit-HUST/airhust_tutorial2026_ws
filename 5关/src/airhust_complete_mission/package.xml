@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>airhust_complete_mission</name>
+  <version>0.1.0</version>
+  <description>AirHust 2026 第五关：综合任务大地图</description>
+  <maintainer email="airhust@todo.todo">AirHust</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>gazebo_msgs</exec_depend>
+</package>

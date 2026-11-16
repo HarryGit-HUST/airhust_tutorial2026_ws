@@ -68,16 +68,11 @@ source devel/setup.zsh
 
 然而实际运行过程中是内存中的点云数据，往往不会作为点云文件储存下来。
 
-### 参考答案
+### 如何检查结果
 
-`solutions/` 包含与练习对应的参考答案。可以直接阅读，也可以独立编译运行：
+各节的输出示例用来说明需要观察的内容。参数、输入或采集过程不同，点数和分簇结果也可能不同。
 
-```shell
-catkin_make --pkg tutorial_pcl_basic -DTUTORIAL_BUILD_SOLUTIONS=ON
-./run --solution 3
-```
-
-这会生成名称以 `solution_` 开头的可执行文件，学生源码保持原样。`./run 3` 始终运行学生程序。文档中的完整运行结果来自参考答案；未填的占位函数只展示流程，不能用来验证算法效果。
+补全源码后，需要同时检查终端输出和实际点云，确认各步处理是否符合要求。
 
 ### 小节和程序编号
 
@@ -92,9 +87,5 @@ catkin_make --pkg tutorial_pcl_basic -DTUTORIAL_BUILD_SOLUTIONS=ON
 | 3.5 聚类 | `05_cluster.cpp` | `./run 5` |
 | 3.6 数据来源与采集 | 按文档准备输入 | 复用前面程序 |
 | 3.7 在线处理练习 | `07_pipeline.cpp` | `./run 7` |
-
-### 开发和体验工作空间
-
-`airhust_tutorial26_pcl_ws` 保存课程源码和参考答案，`airhust_tutorial26_pcl_ws_trial` 用于实际完成练习。两边同步文档、数据、公共代码和未完成的架子；体验空间里已经填写的练习保留各自内容，需要调整接口时迁移已有实现。编译产物、输出文件和各自 `.git` 不参与同步。
 
 **下一步请来到[3.1 点云在内存里怎么储存的](01-io.md)**

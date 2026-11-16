@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+
+# 任务书源文件（只提交 PDF）
+第五关任务书.tex
+
+# build
+build/
+devel/
+install/
+.catkin_workspace
+src/CMakeLists.txt
+
+# python
+__pycache__/
+*.pyc
+
+# latex 中间产物
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.xdv
+
+# 离线生成柱子布局的脚本与预览图（只提交 pillar_layouts.json）
+gen_pillar_layouts.py
+pillar_layouts_*.png
+
+# 模型权重
+yolo26n_pad.pt

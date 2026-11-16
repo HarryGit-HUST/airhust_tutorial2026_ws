@@ -133,32 +133,24 @@ sor.filter(out);
 
 ## 算中心
 
-`clusterCenter` 要做两件事：算这一堆的中心，返回点数。打印由 `describeClusters` 负责。
+一组点的质心是它们坐标的平均值。PCL 的 `compute3DCentroid` 可以接收整张点云，也可以通过下标指定参与计算的点。
+
+本节使用的重载签名如下，头文件是 `<pcl/common/centroid.h>`：
 
 ```cpp
-std::size_t count = 0;  // ← 换成这一堆的点数
-// ← 这里算中心，写进 centroid
-return count;
+template <typename PointT, typename Scalar>
+unsigned int compute3DCentroid(const pcl::PointCloud<PointT>& cloud,
+                              const std::vector<int>& indices,
+                              Eigen::Matrix<Scalar, 4, 1>& centroid);
 ```
 
-```cpp
-std::size_t clusterCenter(const Cloud::ConstPtr& cloud, const pcl::PointIndices& one,
-                          Eigen::Vector4f& centroid);
-```
+结果写入四维向量：前三个分量是 x、y、z，第四个为 1。返回值是实际参与计算的有效点数。
 
-一堆点的中心就是它们坐标的平均值。这个重载按下标计算质心，可以省去构造子点云的步骤；也可以传入一张现成的子点云。
-
-```cpp
-pcl::compute3DCentroid(*cloud, one.indices, centroid);
-```
-
-结果写进 `Eigen::Vector4f`：前三个分量是 x、y、z，第四个固定为 1（方便乘 4×4 变换矩阵）。返回值是实际参与计算的点数。
-
-点数是 `one.indices.size()`。
+需要补全的 `clusterCenter` 接收一簇点的下标，将中心写入 `centroid` 并返回点数。打印由 `describeClusters` 负责。
 
 ## 封装成函数
 
-[`05_cluster.cpp`](../src/tutorial_pcl_basic/src/05_cluster.cpp) 的流程是：读点云 → 降采样 → 裁区域 → 聚类 → 染色保存。`downsample` 和 `region` 用的是 3.3 讲过的两个滤波类，已经写好；需要补全的是 `cluster` 和 `clusterCenter`。
+[`05_cluster.cpp`](../src/tutorial_pcl_basic/src/05_cluster.cpp) 的流程是：读点云 → 降采样 → 裁区域 → 聚类 → 染色保存。`downsample` 和 `region` 已经写好，作为 3.3 中滤波接口的基础用法示例；本节需要补全的是 `cluster` 和 `clusterCenter`。
 
 ```cpp
 void downsample(const Cloud::ConstPtr& cloud, Cloud& output, float leaf);
@@ -208,7 +200,7 @@ pcl_viewer out/05_clusters.pcd
 
 ## 运行结果
 
-把原始房间数据传给参考答案，结果如下：
+使用原始房间数据时，一组输出示例如下：
 
 ```text
 输入点数: 112400

@@ -2,7 +2,13 @@
 
 2026 级梯队培训 · 视觉方向（板块三 视觉基础、板块四 仿真单元测试）
 
-**环境**：Ubuntu 20.04 + ROS Noetic + PX4 SITL + Gazebo（镜像已装好）；仓库放在 `~/airhust_tutorial26_vision_lab`，它本身就是 catkin 工作空间。
+**环境**：Ubuntu 20.04 + ROS Noetic + PX4 SITL + Gazebo；
+
+**先把仓库放在 `~/airhust_tutorial26_vision_lab`,第三关和第四关都在这个仓库下**
+
+```bash
+mv ~/airhust_tutorial2026_ws/3关/airhust_tutorial26_vision_lab ~/
+```
 
 **板块三（离线，五个完形填空）**
 

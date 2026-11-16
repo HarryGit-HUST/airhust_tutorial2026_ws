@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="mission">
+
+    <!-- 打开 Gazebo 时的初始视角：整张地图的俯视 -->
+    <gui>
+      <camera name="user_camera">
+        <pose>-6.5 -4 15.0 0 1.57 0</pose>
+      </camera>
+    </gui>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- 地面：17 x 8，Gazebo 白 -->
+    <model name="floor">
+      <static>true</static>
+      <pose>-1.5 -4 -0.01 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>17 8 0.02</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>17 8 0.02</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 四周的墙：2m 高，50% 透明 -->
+    <model name='wall_left'>
+      <static>true</static>
+      <pose>-10.05 -4 1 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>0.1 8 2</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>0.1 8 2</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+          <transparency>0.5</transparency>
+        </visual>
+      </link>
+    </model>
+    <model name='wall_right'>
+      <static>true</static>
+      <pose>7.05 -4 1 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>0.1 8 2</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>0.1 8 2</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+          <transparency>0.5</transparency>
+        </visual>
+      </link>
+    </model>
+    <model name='wall_top'>
+      <static>true</static>
+      <pose>-1.5 0.05 1 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>17 0.1 2</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>17 0.1 2</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+          <transparency>0.5</transparency>
+        </visual>
+      </link>
+    </model>
+    <model name='wall_bottom'>
+      <static>true</static>
+      <pose>-1.5 -8.05 1 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>17 0.1 2</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>17 0.1 2</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+          <transparency>0.5</transparency>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 底部隔墙：y = -6，x -9~-3 和 -2~2；门区与环区之间 y = -3 一道隔墙 -->
+    <model name='wall_obstacle'>
+      <static>true</static>
+      <pose>-6 -6.1 1 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>6 0.2 2</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>6 0.2 2</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+        </visual>
+      </link>
+    </model>
+    <model name='wall_ring'>
+      <static>true</static>
+      <pose>0 -6.1 1 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>4 0.2 2</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>4 0.2 2</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+        </visual>
+      </link>
+    </model>
+    <model name='wall_door_ring'>
+      <static>true</static>
+      <pose>0 -3 1 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>4 0.2 2</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>4 0.2 2</size></box></geometry>
+          <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 起步点：白底黑 H -->
+    <include>
+      <uri>model://h_pad</uri>
+      <pose>-9.5 -4 0.003 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

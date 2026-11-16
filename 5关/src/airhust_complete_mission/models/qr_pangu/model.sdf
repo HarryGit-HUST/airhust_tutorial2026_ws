@@ -1,0 +1,28 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='qr_pangu'>
+    <static>1</static>
+    <link name='link'>
+      <collision name='collision'>
+        <geometry>
+          <box><size>0.5 0.5 0.002</size></box>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>0.5 0.5</size>
+          </plane>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://qr_pangu/materials/scripts</uri>
+            <uri>model://qr_pangu/materials/textures</uri>
+            <name>QrPangu/Texture</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

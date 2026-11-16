@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 无人机出生点：起步区的 H 上，机头朝 +x -->
+    <arg name="x" default="-9.5"/>
+    <arg name="y" default="-4"/>
+    <arg name="z" default="0.1"/>
+    <arg name="R" default="0"/>
+    <arg name="P" default="0"/>
+    <arg name="Y" default="0"/>
+
+    <!-- 模型和地图 -->
+    <arg name="vehicle" default="iris"/>
+    <arg name="world" default="$(find airhust_complete_mission)/worlds/mission.world"/>
+    <arg name="sdf" default="$(find simulation)/models/iris_down_cam/model.sdf"/>
+
+    <!-- gazebo -->
+    <arg name="gui" default="true"/>
+    <arg name="debug" default="false"/>
+    <arg name="verbose" default="false"/>
+    <arg name="paused" default="false"/>
+    <arg name="respawn_gazebo" default="true"/>
+    <!-- MAVROS -->
+    <arg name="fcu_url" default="udp://:14540@localhost:14557"/>
+    <arg name="gcs_url" default="udp://@127.0.0.1:14550"/>
+    <arg name="respawn_mavros" default="false"/>
+    <!-- PX4 -->
+    <arg name="interactive" default="true"/>
+    <!-- 随机布置 -->
+    <arg name="randomize" default="true"/>
+    <arg name="seed" default="0"/>
+
+    <env name="GAZEBO_MODEL_PATH" value="$(find airhust_complete_mission)/models:$(optenv GAZEBO_MODEL_PATH)" />
+
+    <include file="$(find px4)/launch/posix_sitl.launch">
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="z" value="$(arg z)"/>
+        <arg name="R" value="$(arg R)"/>
+        <arg name="P" value="$(arg P)"/>
+        <arg name="Y" value="$(arg Y)"/>
+        <arg name="world" value="$(arg world)"/>
+        <arg name="vehicle" value="$(arg vehicle)"/>
+        <arg name="sdf" value="$(arg sdf)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="interactive" value="$(arg interactive)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
+    </include>
+
+    <include file="$(find mavros)/launch/px4.launch">
+        <arg name="gcs_url" value="$(arg gcs_url)"/>
+        <arg name="fcu_url" value="$(arg fcu_url)"/>
+        <arg name="respawn_mavros" value="$(arg respawn_mavros)"/>
+    </include>
+
+    <!-- 随机摆放柱子、门、方环、二维码和图片 -->
+    <node if="$(arg randomize)" name="mission_spawner" pkg="airhust_complete_mission"
+          type="spawn_random.py" output="screen"/>
+</launch>

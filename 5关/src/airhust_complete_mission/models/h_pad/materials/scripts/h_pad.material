@@ -1,0 +1,17 @@
+material HPad/Texture
+{
+  technique
+  {
+    pass
+    {
+      ambient 1 1 1 1
+      diffuse 1 1 1 1
+      specular 0 0 0 0
+      texture_unit
+      {
+        texture h_pad.png
+        filtering trilinear
+      }
+    }
+  }
+}
