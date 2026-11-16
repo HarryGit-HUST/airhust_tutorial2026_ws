@@ -59,13 +59,13 @@ void setLeafSize (float lx, float ly, float lz);   // 格子边长，米
 void filter (PointCloud &output);
 ```
 
-下面示例中，`cloud` 是输入点云指针，`output` 是输出点云引用。先建对象，再按顺序调用：
+下面用三维坐标点演示调用顺序，`sample` 是输入点云指针，`reduced` 是已有的输出容器：
 
 ```cpp
-pcl::VoxelGrid<pcl::PointXYZI> vg;
-vg.setInputCloud(cloud);                       // 设置输入
-vg.setLeafSize(0.05f, 0.05f, 0.05f);           // 设参数
-vg.filter(output);                               // 取结果
+pcl::VoxelGrid<pcl::PointXYZ> grid;
+grid.setInputCloud(sample);
+grid.setLeafSize(0.1f, 0.1f, 0.1f);
+grid.filter(reduced);
 ```
 
 `Filter<PointT>` 提供 `setInputCloud` 和 `filter`；`FilterIndices<PointT>` 继承它，另外提供 `setIndices`、`setNegative` 这类按下标处理的接口。所以四个滤波类的调用方式一样。
@@ -93,14 +93,12 @@ void setStddevMulThresh (double stddev); // 超过均值多少个标准差算异
 void filter (PointCloud &output);
 ```
 
-用的时候：
+参数的设置方式如下，输入和输出沿用前面的滤波调用方式：
 
 ```cpp
 pcl::StatisticalOutlierRemoval<pcl::PointXYZI> sor;
-sor.setInputCloud(cloud);
-sor.setMeanK(20);
-sor.setStddevMulThresh(1.0);
-sor.filter(output);
+sor.setMeanK(neighbor_count);
+sor.setStddevMulThresh(multiplier);
 ```
 
 `meanK` 是算平均距离时参考几个邻居：取小了，每个点的平均距离本身波动大，容易误判；取大了算得慢。一般 10~50，这里用 20。
@@ -151,15 +149,15 @@ void setMax (const Eigen::Vector4f &max_pt);
 void filter (PointCloud &output);
 ```
 
-用的时候：
+用两个向量设置盒子的最小、最大边界：
 
 ```cpp
 pcl::CropBox<pcl::PointXYZI> crop;
-crop.setInputCloud(cloud);
-crop.setMin(Eigen::Vector4f(1.8f, 1.8f, 0.60f, 1.0f));
-crop.setMax(Eigen::Vector4f(3.5f, 4.5f, 1.20f, 1.0f));
-crop.filter(output);
+crop.setMin(min_corner);
+crop.setMax(max_corner);
 ```
+
+`min_corner` 和 `max_corner` 是 `Eigen::Vector4f`，前三个分量分别是 x、y、z 边界。
 
 只按 x、y、z 三个方向各切一刀时，`CropBox` 和 `PassThrough` 连做三次结果一样，区别是 `CropBox` 一趟扫完、还能带旋转（`setTransform`）。但两者并不等价：`PassThrough` 能按任意字段过滤（比如 `intensity`），`CropBox` 只能按位置。
 
