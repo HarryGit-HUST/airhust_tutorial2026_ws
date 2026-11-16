@@ -1,2 +1,12 @@
 err_max: 0.15
 if_debug: 1
+# 含义：
+# - 圆心相对起飞点为 (2,0)；
+# - 半径 2 m；
+# - 每轮在当前位置前方 20° 选择目标；
+# - 水平合速度上限 0.5 m/s。
+circle_center_x: 2.0
+circle_center_y: 0.0
+circle_radius: 2.0
+circle_lookahead_deg: 20.0
+circle_speed_max: 0.5

@@ -11,6 +11,13 @@ using std::endl;
 int mission_num = 0;
 float if_debug = 0;
 float err_max = 0.2;
+
+float circle_center_x = 2.0f;
+float circle_center_y = 0.0f;
+float circle_radius = 2.0f;
+float circle_lookahead_deg = 20.0f;
+float circle_speed_max = 0.5f;
+
 void print_param()
 {
   std::cout << "=== 控制参数 ===" << std::endl;
@@ -49,9 +56,13 @@ int main(int argc, char **argv)
 
   nh.param<float>("err_max", err_max, 0);
   nh.param<float>("if_debug", if_debug, 0);
-  print_param();
+  nh.param<float>("circle_center_x", circle_center_x, 2.0);
+nh.param<float>("circle_center_y", circle_center_y, 0.0);
+nh.param<float>("circle_radius", circle_radius, 2.0);
+nh.param<float>("circle_lookahead_deg", circle_lookahead_deg, 20.0);
+nh.param<float>("circle_speed_max", circle_speed_max, 0.5);
+ print_param();
 
-  
   int choice = 0;
   std::cout << "1 to go on , else to quit" << std::endl;
   std::cin >> choice;
@@ -146,24 +157,34 @@ int main(int argc, char **argv)
         }
         break;
 
-      //世界系前进
+      //世界系前进（现在是飞到圆周起点）
       case 2:
-        if (mission_pos_cruise(4.0, 0.0, ALTITUDE, 1.57, err_max))
+        if (mission_pos_cruise(
+    circle_center_x + circle_radius,
+    circle_center_y,
+    ALTITUDE,
+    0.0,
+    err_max))
         {
           mission_num = 3;
           last_request = ros::Time::now();
         }
         break;
     
-      //机体系右移
+      //原机体系右移，现改为圆周
       case 3:
-        if(current_position_cruise(0.0, -4.0, ALTITUDE, -1.57, err_max))
-        {
-          mission_num = 4;
-          last_request = ros::Time::now();
-        }
-        break;
-
+    if (mission_circle_cruise(
+            circle_center_x,
+            circle_center_y,
+            circle_radius,
+            circle_lookahead_deg *
+                static_cast<float>(M_PI) / 180.0f,
+            circle_speed_max,
+            0.0f))
+    {
+        mission_num = 4;
+    }
+    break;
       //悬停
       case 4:
         if(hover(3.0))

@@ -51,7 +51,7 @@ void local_pos_cb(const nav_msgs::Odometry::ConstPtr &msg)
 float mission_pos_cruise_last_position_x = 0;
 float mission_pos_cruise_last_position_y = 0;
 bool mission_pos_cruise_flag = false;
-bool mission_pos_cruise(float x, float y, float z, float target_yaw, float error_max)
+bool mission_pos_cruise(float x, float y, float z, float target_yaw, float error_max)  //任务位置巡航，去一个固定位置
 {
 	if (mission_pos_cruise_flag == false)
 	{
@@ -60,7 +60,7 @@ bool mission_pos_cruise(float x, float y, float z, float target_yaw, float error
 		mission_pos_cruise_flag = true;
 	}
 	setpoint_raw.type_mask = /*1 + 2 + 4 */ +8 + 16 + 32 + 64 + 128 + 256 + 512 /*+ 1024 */ + 2048;
-	setpoint_raw.coordinate_frame = 1;
+	setpoint_raw.coordinate_frame = 1;   //局部坐标系
 	setpoint_raw.position.x = x + init_position_x_take_off;
 	setpoint_raw.position.y = y + init_position_y_take_off;
 	setpoint_raw.position.z = z + init_position_z_take_off;
@@ -78,11 +78,115 @@ bool mission_pos_cruise(float x, float y, float z, float target_yaw, float error
 	return false;
 }
 
+//转圈
+//圆周任务是否已经初始化并开始
+bool mission_circle_cruise_flag = false;
+//上一控制周期，无人机相对圆心所在的圆周角
+float circle_last_angle = 0.0f;
+//从开始绕圈到现在，实际累计转过的总角度
+float circle_progress = 0.0f;
+bool mission_circle_cruise(float center_x,
+                           float center_y,
+                           float radius,
+                           float lookahead_angle,
+                           float speed_max,
+                           float target_yaw){
+	const float position_gain = 0.5f;
+	const float altitude_gain = 0.5f;
+	const float vertical_speed_max = 0.2f;
+
+	//读取当前位置
+	float current_x = local_pos.pose.pose.position.x;
+	float current_y = local_pos.pose.pose.position.y;
+	float current_z = local_pos.pose.pose.position.z;
+	// 计算当前位置相对圆心的角度 current_angle
+	float offset_x = current_x - center_x;
+	float offset_y = current_y - center_y;
+	float current_angle = std::atan2(offset_y, offset_x);
+	if (mission_circle_cruise_flag == false)
+	{
+		
+		circle_last_angle = current_angle;
+		circle_progress = 0.0f;
+		mission_circle_cruise_flag = true;
+		ROS_INFO("circle mission started");
+	}
+	//前方目标角 = current_angle + 20°
+	float target_angle = current_angle + lookahead_angle;
+	//用圆心、半径和前方目标角算出 target_x、target_y
+	float target_x = center_x + radius*std::cos(target_angle);
+	float target_y = center_y + radius*std::sin(target_angle);
+	//计算无人机到 target 的位置误差
+	float error_x = target_x - current_x;
+	float error_y = target_y - current_y;
+	//根据误差计算速度并限速
+	float velocity_x = position_gain * error_x;
+	float velocity_y = position_gain * error_y;
+	float horizontal_speed = std::sqrt(velocity_x * velocity_x + velocity_y * velocity_y);
+	if (horizontal_speed > speed_max)
+	{
+    float speed_scale = speed_max / horizontal_speed;
+	velocity_x *= speed_scale;
+    velocity_y *= speed_scale;
+	}
+
+	// 使用高度误差修正竖直速度。
+	float target_z = ALTITUDE + init_position_z_take_off;
+	float altitude_error = target_z - current_z;
+	float velocity_z = altitude_gain * altitude_error;
+
+	if (velocity_z > vertical_speed_max)
+	{
+		velocity_z = vertical_speed_max;
+	}
+	else if (velocity_z < -vertical_speed_max)
+	{
+		velocity_z = -vertical_speed_max;
+	}
+
+    //填写 setpoint_raw.velocity
+	setpoint_raw.type_mask = 1 + 2 + 4 + 64 + 128 + 256 + 2048;
+	setpoint_raw.coordinate_frame = 1;   //把控制目标使用的坐标系设置为本地固定坐标系
+	setpoint_raw.velocity.x = velocity_x;
+	setpoint_raw.velocity.y = velocity_y;
+	setpoint_raw.velocity.z = velocity_z;
+	setpoint_raw.yaw = target_yaw;
+	//计算本周期转过的角度增量
+	float raw_angle_delta = current_angle - circle_last_angle;
+	// 将角度增量限制在 -π 到 π 之间
+	float angle_delta = std::atan2(std::sin(raw_angle_delta), std::cos(raw_angle_delta));
+	// 累计实际转过的角度
+	circle_progress += angle_delta;
+	circle_last_angle = current_angle;
+	ROS_INFO_THROTTLE(
+        0.5,
+        "circle progress: %.1f / 360 deg, altitude: %.2f, vz: %.2f",
+        circle_progress * 180.0f /
+            static_cast<float>(M_PI),
+        current_z, velocity_z);
+	// 如果累计转过的角度达到或超过 360°，则认为任务完成
+	if (std::fabs(circle_progress) >= 2.0f * static_cast<float>(M_PI))
+	{
+		setpoint_raw.velocity.x = 0.0f;
+        setpoint_raw.velocity.y = 0.0f;
+        setpoint_raw.velocity.z = 0.0f;
+
+        mission_circle_cruise_flag = false;
+        circle_last_angle = 0.0f;
+        circle_progress = 0.0f;
+
+        ROS_INFO("circle mission complete");
+        return true;
+	}
+	return false;
+}
+
+
 // 以首次调用时的当前位置为 XY 平移起点；不进行机体航向旋转。
 float current_position_cruise_last_position_x = 0;
 float current_position_cruise_last_position_y = 0;
 bool current_position_cruise_flag = false;
-bool current_position_cruise(float x, float y, float z, float target_yaw, float error_max)
+bool current_position_cruise(float x, float y, float z, float target_yaw, float error_max)  //从当前位置做相对位移
 {
 	if (current_position_cruise_flag == false)
 	{
@@ -93,7 +197,7 @@ bool current_position_cruise(float x, float y, float z, float target_yaw, float 
 	// float p_xy = 0.8;
 	setpoint_raw.type_mask = /*1 + 2 + 4 */+ 8 + 16  + 32 + 64 + 128 + 256 + 512 /*+ 1024 */+ 2048;
 	setpoint_raw.coordinate_frame = 1;
-	setpoint_raw.position.x = x + current_position_cruise_last_position_x;
+	setpoint_raw.position.x = x + current_position_cruise_last_position_x;//目标=传入的偏移量+首次调用时的当前位置
 	setpoint_raw.position.y = y + current_position_cruise_last_position_y;
 	setpoint_raw.position.z = z;
 	setpoint_raw.yaw = target_yaw;
