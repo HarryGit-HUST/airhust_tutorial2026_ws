@@ -13,7 +13,6 @@ usage() {
 用法：
   ./run <1|2|3|5> [点云文件]    阶段三的练习
   ./run 7 [点云文件]                   在线综合练习
-  ./run --solution <编号> [点云文件]    运行独立编译的参考答案
 
 例子：
   ./run 1                               # 看看点云里有什么
@@ -23,13 +22,6 @@ EOF
 
 [ $# -ge 1 ] || { usage; exit 0; }
 case "$1" in -h|--help|help) usage; exit 0 ;; esac
-
-solution=false
-if [ "$1" = "--solution" ]; then
-  solution=true
-  shift
-  [ $# -ge 1 ] || { usage >&2; exit 1; }
-fi
 
 mode="$1"; shift
 
@@ -50,15 +42,12 @@ case "$mode" in
     ;;
 esac
 
-if "$solution"; then
-  bin="solution_$bin"
-fi
 if [ ! -d devel/lib/tutorial_pcl_basic ]; then
   echo "请先执行 catkin_make --pkg tutorial_pcl_basic" >&2
   exit 1
 fi
 if [ ! -x "devel/lib/tutorial_pcl_basic/$bin" ]; then
-  echo "找不到程序 $bin，请重新编译。参考答案需加 -DTUTORIAL_BUILD_SOLUTIONS=ON" >&2
+  echo "找不到程序 $bin，请重新编译。" >&2
   exit 1
 fi
 exec "devel/lib/tutorial_pcl_basic/$bin" "$@"
